@@ -5,21 +5,18 @@
 #include "Player.h"
 #include <time.h>
 #include "DartBoard.h"
+#include "Game.h"
+
 
 #define GAMEMODE 501
 
 int main()
 {
-    srand(time(NULL));
-    //std::cout << "Hello World!\n";
-    Player p1("Jacek", GAMEMODE);
     
+    Game game;
+    game.startGame();
 
-    for (int i = 0; i < 10; i++)
-    {
-        p1.throwDouble(10);
-    }
-  
+      
 
 }
 

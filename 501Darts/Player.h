@@ -1,21 +1,27 @@
 #pragma once
 #include <string>
+#include "DartBoard.h"
+
 
 
 #define GAMEMODE 501
 #define OUTER 25
 #define BULL 50
 
+class DartBoard;
 
 class Player
 {
 
+
+
     std::string playerName;
     uint16_t playerScore;
+    bool bustedScore;
 
 public:
-    Player();
-    Player(std::string n,uint16_t);
+    
+    Player(std::string name = " ",uint16_t score =GAMEMODE);
     ~Player();
 
 
@@ -35,15 +41,22 @@ public:
     void displayDoubleMiss(int target, int result);
     void displayDoubleHit(int target, int result);
 
+    void displayTrebleMiss(int target, int result);
+    void displayTrebleHit(int target, int result);
+
+
+
     //THROWING
 
-    void throwSingle(uint16_t d);
-    void throwBull(uint16_t d);
-    void throwDouble(uint16_t d);
-    void throwTreble(uint16_t d);
+    void throwSingle(uint16_t d, DartBoard* board);
+    void throwBull(uint16_t d, DartBoard* board);
+    void throwDouble(uint16_t d, DartBoard* board);
+    void throwTreble(uint16_t d , DartBoard* board);
 
+    void setBusted(bool bustedScore);
+    bool getBusted();
 
-
+    bool checkWin();
 
 
 

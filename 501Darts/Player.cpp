@@ -2,12 +2,7 @@
 #include "Player.h"
 #include <iostream>
 
-Player::Player()
-{
-	playerName = " ";
-	playerScore = 0;
-	
-}
+
 
 Player::Player(std::string n, uint16_t s)
 {
@@ -69,19 +64,26 @@ void Player::displayDoubleHit(int target, int result)
 	std::cout << " Hit :) Scored:  " << result << "  Score: " << playerScore << std::endl;
 }
 
-
-
-
-void Player::throwSingle(uint16_t d)
+void Player::displayTrebleMiss(int target, int result)
 {
-	//  return result of throwing for single d with accuracy 88% (or 80% for the outer)
+	std::cout << "Aiming at.. " << target << " treble " << std::endl;
+	std::cout << " Miss :( Scored: " << result << " Score: " << playerScore << std::endl;
+}
 
-	// Board neighbours ignoring slot zero
-	int bd[2][21] = { {0,20,15,17,18,12,13,19,16,14,6,8,9,4,11,10,7,2,1,3,5},
-			   {0,18,17,19,13,20,10,16,11,12,15,14,5,6,9,2,8,3,4,7,1} };
+void Player::displayTrebleHit(int target, int result)
+{
+	std::cout << "Aiming at... " << target << " treble " << std::endl;
+	std::cout << " Hit :) Scored:  " << result << "  Score: " << playerScore << std::endl;
+}
 
-	uint16_t r = rand() % 100;
-	uint16_t rn = 1 + rand() % 20;
+
+
+
+void Player::throwSingle(uint16_t d, DartBoard* board)
+{
+	
+	uint16_t r = rand() % 100+1;
+	uint16_t rn =  rand() % 20+1;
 
 
 	if (d == OUTER) {		// outer  80%
@@ -89,14 +91,12 @@ void Player::throwSingle(uint16_t d)
 		{
 			subtractScore(OUTER);
 			displaySingleHit(OUTER, OUTER);
-			//std::cout << "Aiming at outer.. " << " HIT :) Scored: " << OUTER << " Score: " << playerScore << std::endl;
 		}		
 			
-		else if (r < 90)
+		else if (r < 75) // Bull 75%
 		{
 			subtractScore(BULL);
 			displaySingleMiss(OUTER, BULL);
-			//std::cout << "Aiming at outer.. " << " MISS :( Scored: " << BULL << " Score: " << playerScore << std::endl;
 
 		}
 			
@@ -104,7 +104,6 @@ void Player::throwSingle(uint16_t d)
 		{
 			subtractScore(rn);
 			displaySingleMiss(OUTER, rn);
-			//std::cout << "Aiming at outer... " << " MISS :( Scored: " << rn << " Score: " << playerScore << std::endl;
 
 		}
 			
@@ -115,20 +114,17 @@ void Player::throwSingle(uint16_t d)
 		{
 			subtractScore(d);
 			displaySingleHit(d, d);
-			//std::cout << "Aiming for a single... " << d << " HIT :) SCORED: " << d << " Score: " << playerScore << std::endl;
 		}			
 		else if (r < 92)
 		{
-			subtractScore(bd[0][d]);
-			displaySingleMiss(d, bd[0][d]);
-			//std::cout << "Aiming for a single... " << d << " MISS :( SCORED: " << bd[0][d] << " Score: " << playerScore << std::endl;
+			subtractScore(board->aimingPosition(0,d));
+			displaySingleMiss(d, board->aimingPosition(0, d));
 
 		}			
 		else if (r < 96)
 		{
-			subtractScore(bd[1][d]);
-			displaySingleMiss(d, bd[1][d]);
-			//std::cout << "Aiming for a single... " << d << " MISS :( SCORED: " << bd[1][d] << " Score: " << playerScore << std::endl;
+			subtractScore(board->aimingPosition(1,d));
+			displaySingleMiss(d, board->aimingPosition(1, d));
 
 						
 		}			
@@ -136,28 +132,24 @@ void Player::throwSingle(uint16_t d)
 		{
 			subtractScore(rn);
 			displaySingleMiss(d, rn);
-			//std::cout << "Aiming for a single... " << d << " MISS :( SCORED: " << rn << " Score: " << playerScore << std::endl;
 
 		}			
-		
-			
-
-
 	}
-
 }
 
-void Player::throwBull(uint16_t percent)
+void Player::throwBull(uint16_t percent, DartBoard* board)
 {
 	//  Throw for the bull with accuracy p%  (20<p<85)
 
 	int r = rand() % 100;
-	int rn = +rand() % 20;
+	int ra = +rand() % 20;
+	int ran = +rand() % 2+1;
+	int ran2 = +rand() % 2 + 1;
+
 	if (r < (percent - 20))
 	{
 		subtractScore(BULL);
 		displaySingleHit(BULL, BULL);
-		//std::cout << "SCORED: " << BULL << " SCORE:" << playerScore << std::endl;
 		
 	}		
 	else if (r < 85)
@@ -168,8 +160,8 @@ void Player::throwBull(uint16_t percent)
 	}
 	else
 	{
-		subtractScore(rn);
-		displaySingleMiss(BULL, rn);
+		subtractScore(board->aimingPosition(ran,ran2 ));		
+		displaySingleMiss(BULL, board->aimingPosition(ran, ran2));
 		//std::cout << "SCORED: " << rn << " SCORE:" << playerScore << std::endl;
 	}
 		
@@ -182,26 +174,25 @@ void Player::throwBull(uint16_t percent)
 
 }
 
-void Player::throwDouble(uint16_t d)
+void Player::throwDouble(uint16_t d, DartBoard* board)
 {
 	//  return result of throwing for double d with accuracy 80%
 	
 	// Board neighbours ignoring slot zero
-	
-	int bd[2][21] = { {0,20,15,17,18,12,13,19,16,14,6,8,9,4,11,10,7,2,1,3,5},
-			   {0,18,17,19,13,20,10,16,11,12,15,14,5,6,9,2,8,3,4,7,1} };
+
 	int r = rand() % 100;
 
 	if (r < 80)
 	{
-		subtractScore(2 * d);	
+	    subtractScore(2 * d);	
 		displayDoubleHit(d, 2 * d);
-	}		
+	}	
+	/*
 	else if (r < 85)
 	{
 		subtractScore(0);
 		displayDoubleMiss(d, 0);
-	}
+	}*/
 	else if (r < 90)
 	{
 		subtractScore(d);
@@ -210,33 +201,103 @@ void Player::throwDouble(uint16_t d)
 	}		
 	else if (r < 93)
 	{
-		subtractScore(2 * bd[0][d]);
-		displayDoubleMiss(d, 2 * bd[0][d]);
+		subtractScore(2* board->aimingPosition( 0, d));		//chance for scoring double left
+		displayDoubleMiss(d, 2 * board->aimingPosition(0, d));
 	}		
 	else if (r < 96)
 	{
-		subtractScore(2 * bd[1][d]); 
-		displayDoubleMiss(d, 2 * bd[1][d]);
+		subtractScore(2 * board->aimingPosition(1, d));	//chance for scoring double right
+		displayDoubleMiss(d, 2 * board->aimingPosition(1, d));
 		
 	}		
-	else if (r < 98)
+	else if (r < 98)//chance for scoring single
 	{
-		subtractScore(bd[0][d]);
-		displayDoubleMiss(d, bd[0][d]);
+		subtractScore(board->aimingPosition(0, d));		
+		displayDoubleMiss(d, board->aimingPosition(0, d));
 		
 	}		
 	else
 	{
-		subtractScore(bd[1][d]);
-		displayDoubleMiss(d, bd[1][d]);
+		subtractScore(board->aimingPosition(1, d));		
+		displayDoubleMiss(d, board->aimingPosition(1, d));
 	}
 		
 
 	
 }
 
-void Player::throwTreble(uint16_t d)
+void Player::throwTreble(uint16_t d, DartBoard* board)
 {
+		//  return result of throwing for treble d with accuracy p%  (o<90)
+
+		// Board neighbours ignoring slot zero
+		
+		int r = rand() % 100;
+
+		if (r < 70) //treble hit
+		{
+			subtractScore(3 * d);
+			displayTrebleHit(d, 3 * d);
+		}
+			
+		else if (r < 80) //single hit
+		{
+			subtractScore(d);
+			displayTrebleMiss(d, d);
+			
+		}
+		else if (r < 90) //single hit
+		{
+			subtractScore(0);
+			displayTrebleMiss(d, 0);
+
+		}
+			
+		else if (r < 93)//treble left hand score hit
+		{
+			subtractScore(3* board->aimingPosition(0, d));			
+			displayTrebleMiss(d, 3 * board->aimingPosition(0, d));
+		}
+			
+		else if (r < 96)//treble right hand score hit
+		{
+			subtractScore(3 * board->aimingPosition(1, d));
+			displayTrebleMiss(d, 3 * board->aimingPosition(1, d));
+			
+			
+		}		
+			
+		else if (r < 98)//single of left hand score hit
+		{
+			subtractScore(board->aimingPosition(0, d));
+			displayTrebleMiss(d, board->aimingPosition(0, d));			
+						
+		}
+			
+		else//single of right hand score hit
+		{
+			subtractScore(board->aimingPosition(1, d));
+			displayTrebleMiss(d, board->aimingPosition(1, d));					
+			
+		}
+			
+	
+
+}
+
+void Player::setBusted(bool bustedValue)
+{
+	bustedScore = bustedValue;
+}
+
+bool Player::getBusted()
+{
+	return bustedScore;
+}
+
+bool Player::checkWin()
+{
+	return (playerScore == 0);
 }
 
 
